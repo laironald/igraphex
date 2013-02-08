@@ -13,28 +13,26 @@ class Graph(Graph):
         drawer = drawer_factory(context, bbox)
         drawer.draw(self, palette, *args, **kwds)
 
-    def top_components(self, num=3, debug=False):
+    def fetch_components(self, comp=[0,1,2]):
         """ 
-        This allows us to quickly return n number of top components
+        This returns a graph of the components specified in num
         
         Args:
-          num: number of components to return
+          comp: the components to return (default = top3)
+            if list, returns those specific components, if number return range
         Return:
           A list of the components
         """
         mem = self.components().membership
-        comp = {}
+        compcnt = {}
         for k in mem:
-            if k not in comp:
-                comp[k] = 0
-            comp[k] = comp[k] + 1
-        top = sorted(comp.items(), key=operator.itemgetter(1), reverse=True)[:num]
+            if k not in compcnt:
+                compcnt[k] = 0
+            compcnt[k] = compcnt[k] + 1
+        top = sorted(compcnt.items(), key=operator.itemgetter(1), reverse=True)
 
-        c = []
-        for t in top:
-            c.append(self.vs(
-                [i for i,m in enumerate(mem) if m==t[0]]).subgraph())
-            if debug:
-                print t, c[-1].vcount(), c[-1].ecount()
-        return c
+        if comp.__class__.__name__ not in "list":
+            comp = range(0, comp)
 
+        in_t = [top[c][0] for c in comp]
+        return self.vs([i for i,m in enumerate(mem) if m in in_t]).subgraph()
