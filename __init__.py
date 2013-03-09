@@ -13,13 +13,14 @@ class Graph(Graph):
         drawer = drawer_factory(context, bbox)
         drawer.draw(self, palette, *args, **kwds)
 
-    def fetch_components(self, comp=[0,1,2]):
+    def fetch_components(self, comp=[0,1,2], mem_var=False):
         """ 
         This returns a graph of the components specified in num
         
         Args:
           comp: the components to return (default = top3)
             if list, returns those specific components, if number return range
+          mem: shall we return an additional variable called comp?
         Return:
           A list of the components
         """
@@ -30,6 +31,9 @@ class Graph(Graph):
                 compcnt[k] = 0
             compcnt[k] = compcnt[k] + 1
         top = sorted(compcnt.items(), key=operator.itemgetter(1), reverse=True)
+
+        if mem_var:
+          self.vs["component"] = [top.index((k, compcnt[k])) for k in mem]
 
         if comp.__class__.__name__ not in "list":
             comp = range(0, comp)
